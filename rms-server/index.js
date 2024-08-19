@@ -531,7 +531,7 @@ app.put("/foods/:id", (req, res) => {
   });
 });
 
-// Endpoint to Food a order
+// Endpoint to delete a order
 app.delete("/foods/:id", (req, res) => {
   const id = req.params.id; // Assuming the ID is passed in the URL
   const query = "DELETE FROM foods WHERE foodID = ?";
@@ -624,6 +624,42 @@ app.post("/users", (req, res) => {
 });
 
 
+
+// Add foods to DB
+app.post("/foods", (req, res) => {
+  const foodInfo = req.body;
+
+  const query = "INSERT INTO foods SET ?";
+
+  db.query(query, foodInfo, (err, result) => {
+    if (err) {
+      console.error("Error inserting user data: " + err.stack);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    console.log("Food data inserted successfully");
+    res.status(200).send("Food data inserted successfully");
+  });
+});
+// Add Order to DB with Validation
+app.post("/orders", (req, res) => {
+  const orderInfo = req.body;
+
+  // Insert the order into the database
+  const insertQuery = "INSERT INTO orders SET ?";
+
+  db.query(insertQuery, orderInfo, (insertErr, result) => {
+    if (insertErr) {
+      console.error("Error inserting order data: " + insertErr.stack);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    console.log("Order data inserted successfully");
+    res.status(200).send("Order data inserted successfully");
+  });
+});
 
 
 
