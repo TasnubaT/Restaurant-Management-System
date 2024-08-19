@@ -382,6 +382,112 @@ app.patch("/users/cashier/:id", (req, res) => {
 
 
 
+// Change Salary
+app.put("/salary/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("test", req.body);
+  const updatedSalary = req.body;
+
+  const sql = `
+    UPDATE users
+    SET
+      salary = ?
+    WHERE userID = ?
+  `;
+
+  const values = [updatedSalary.salary, id];
+
+  // Execute the SQL query using db.query
+  db.query(sql, values, (error, result) => {
+    if (error) {
+      console.error("Error updating salary:", error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+// Change Status Delivered
+
+app.patch("/orders/:id", (req, res) => {
+  const id = req.params.id;
+
+  const sql = 'UPDATE orders SET deliveryStatus = "delivered" WHERE foodID = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "Food not found" });
+    }
+
+    res.send(result);
+  });
+});
+
+// Endpoint to get a food item by foodID
+app.get("/all-foods/:id", (req, res) => {
+  const foodID = req.params.id;
+  console.log(foodID);
+  const query = "SELECT * FROM foods WHERE foodID = ?";
+
+  db.query(query, [foodID], (err, result) => {
+    if (err) {
+      console.error("Error retrieving food:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    if (result.length === 0) {
+      // No matching food item found
+      res.status(404).send("Food not found");
+    } else {
+      // Food item found, send it in the response
+      const foodItem = result[0];
+      res.send(foodItem);
+    }
+  });
+});
+
+// Endpoint to delete a user
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id; // Assuming the ID is passed in the URL
+  const query = "DELETE FROM users WHERE userID = ?";
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("Error deleting user:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    console.log("User deleted successfully");
+    res.status(200).send("User deleted successfully");
+  });
+});
+// Endpoint to delete a order
+app.delete("/orders/:id", (req, res) => {
+  const id = req.params.id; // Assuming the ID is passed in the URL
+  const query = "DELETE FROM orders WHERE id = ?";
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("Error cancelling order:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    console.log("Order cancelled successfully");
+    res.status(200).send("Order cancelled successfully");
+  });
+});
+
+
+
 
 
 
