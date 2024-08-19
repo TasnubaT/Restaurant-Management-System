@@ -78,6 +78,76 @@ const queryAsync = util.promisify(db.query);
 
 
 
+// Route to get user information from the database
+app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const sql = "SELECT * FROM users";
+
+    db.query(sql, (err, results) => {
+      if (err) {
+        console.error("Error executing query:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+
+      res.json(results);
+    });
+  } catch (error) {
+    console.error("Error executing query:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route to get orders information by user email from the database
+app.get("/orders/:email", (req, res) => {
+  const userEmail = req.params.email;
+
+  const query = "SELECT * FROM orders WHERE userEmail = ?";
+
+  db.query(query, [userEmail], (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    // Always respond with a 200 status code
+    res.status(200).json(results);
+  });
+});
+
+// Route to get all orders information by admin
+app.get("/orders", (req, res) => {
+  const query = "SELECT * FROM orders";
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (results.length === 0) {
+      // No orders found for the provided email
+      return res.status(404).send("Orders not found");
+    }
+
+    // Orders found, send the orders information in the response
+    res.json(results);
+  });
+});
+// Route to get orders information by manager email from the database
+app.get("/orders/manager/:email", (req, res) => {
+  const userEmail = req.params.email;
+
+  const query = "SELECT * FROM orders WHERE managerEmail = ?";
+
+  db.query(query, [userEmail], (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.status(200).json(results);
+  });
+});
 
 
 
