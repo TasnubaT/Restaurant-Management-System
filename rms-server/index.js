@@ -14,8 +14,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -75,8 +73,6 @@ const verifyAdmin = (req, res, next) => {
 };
 
 const queryAsync = util.promisify(db.query);
-
-
 
 // Route to get user information from the database
 app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
@@ -148,10 +144,6 @@ app.get("/orders/manager/:email", (req, res) => {
     res.status(200).json(results);
   });
 });
-
-
-
-
 
 // Route to get orders information by Cashier email from the database
 app.get("/delivered-orders", (req, res) => {
@@ -271,11 +263,7 @@ app.get("/users/customer/:email", verifyToken, (req, res) => {
   });
 });
 
-
-
-
-
-// Check Cashier
+// Check isCashier
 app.get("/users/cashier/:email", verifyToken, (req, res) => {
   const email = req.params.email;
   console.log("email is", email);
@@ -378,9 +366,6 @@ app.patch("/users/cashier/:id", (req, res) => {
     res.send(result);
   });
 });
-
-
-
 
 // Change Salary
 app.put("/salary/:id", (req, res) => {
@@ -486,10 +471,6 @@ app.delete("/orders/:id", (req, res) => {
   });
 });
 
-
-
-
-
 // Update Foods
 app.put("/foods/:id", (req, res) => {
   const id = req.params.id;
@@ -563,7 +544,6 @@ app.get("/foods", (req, res) => {
   });
 });
 
-
 // Route to get SEARCHED foods information from the database
 app.get("/searched-foods", (req, res) => {
   const search = req.query.search;
@@ -584,8 +564,6 @@ app.get("/searched-foods", (req, res) => {
     console.log("search", results);
   });
 });
-
-
 
 // Send User Info to DB
 app.post("/users", (req, res) => {
@@ -623,8 +601,6 @@ app.post("/users", (req, res) => {
   });
 });
 
-
-
 // Add foods to DB
 app.post("/foods", (req, res) => {
   const foodInfo = req.body;
@@ -660,33 +636,6 @@ app.post("/orders", (req, res) => {
     res.status(200).send("Order data inserted successfully");
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Create a simple route
 app.get("/", (req, res) => {
