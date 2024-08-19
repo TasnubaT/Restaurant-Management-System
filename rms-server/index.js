@@ -153,6 +153,132 @@ app.get("/orders/manager/:email", (req, res) => {
 
 
 
+// Route to get orders information by Cashier email from the database
+app.get("/delivered-orders", (req, res) => {
+  const query = "SELECT * FROM orders WHERE deliveryStatus = 'delivered'";
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log("check", results);
+    if (results.length === 0) {
+      // No orders found for the provided email
+      return res.status(404).send("Delivered item not found");
+    }
+
+    // Orders found, send the orders information in the response
+    res.json(results);
+    console.log("test", results);
+  });
+});
+// Route to get foods information by manager email from the database
+app.get("/foods/manager/:email", (req, res) => {
+  const userEmail = req.params.email;
+
+  const query = "SELECT * FROM foods WHERE managerEmail = ?";
+
+  db.query(query, [userEmail], (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (results.length === 0) {
+      // No orders found for the provided email
+      return res.status(404).send("Food not found");
+    }
+
+    // Orders found, send the orders information in the response
+    res.json(results);
+  });
+});
+
+// Check isAdmin
+app.get("/users/admin/:email", verifyToken, (req, res) => {
+  const email = req.params.email;
+  console.log("email is", email);
+
+  if (email !== req.decoded.email) {
+    return res.status(403).send({ message: "Forbidden" });
+  }
+
+  const sql = "SELECT userRole FROM users WHERE userEmail = ?";
+
+  db.query(sql, [email], (err, user) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log(user);
+    let admin = false;
+    if (user && user.length > 0) {
+      admin = user[0].userRole === "admin";
+    }
+
+    res.send({ admin });
+  });
+});
+// Check isManager
+app.get("/users/manager/:email", verifyToken, (req, res) => {
+  const email = req.params.email;
+  console.log("email is", email);
+
+  if (email !== req.decoded.email) {
+    return res.status(403).send({ message: "Forbidden" });
+  }
+
+  const sql = "SELECT userRole FROM users WHERE userEmail = ?";
+
+  db.query(sql, [email], (err, user) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log(user);
+    let manager = false;
+    if (user && user.length > 0) {
+      manager = user[0].userRole === "manager";
+    }
+
+    res.send({ manager });
+  });
+});
+// Check Customer
+app.get("/users/customer/:email", verifyToken, (req, res) => {
+  const email = req.params.email;
+  console.log("email is", email);
+
+  if (email !== req.decoded.email) {
+    return res.status(403).send({ message: "Forbidden" });
+  }
+
+  const sql = "SELECT userRole FROM users WHERE userEmail = ?";
+
+  db.query(sql, [email], (err, user) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log(user);
+    let customer = false;
+    if (user && user.length > 0) {
+      customer = user[0].userRole === "customer";
+    }
+
+    res.send({ customer });
+  });
+});
+
+
+
+
+
+
+
+
+
 
 
 
