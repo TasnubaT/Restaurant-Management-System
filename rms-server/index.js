@@ -490,6 +490,140 @@ app.delete("/orders/:id", (req, res) => {
 
 
 
+// Update Foods
+app.put("/foods/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("Request params:", req.params);
+
+  console.log("check id", id);
+  const updateFoodInfo = req.body;
+  console.log("Body", updateFoodInfo);
+
+  // Use a template string to create the SQL query
+  const sql = `
+    UPDATE foods
+    SET
+      foodTitle = ?,
+      foodDescription = ?,
+      foodImage = ?,
+      foodPrice = ?,
+      foodCategory = ?
+    WHERE foodID = ?
+  `;
+
+  const values = [
+    updateFoodInfo.foodTitle,
+    updateFoodInfo.foodDescription,
+    updateFoodInfo.foodImage,
+    updateFoodInfo.foodPrice,
+    updateFoodInfo.foodCategory,
+    id,
+  ];
+
+  // Execute the SQL query using db.query
+  db.query(sql, values, (error, result) => {
+    if (error) {
+      console.error("Error updating food:", error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+// Endpoint to Food a order
+app.delete("/foods/:id", (req, res) => {
+  const id = req.params.id; // Assuming the ID is passed in the URL
+  const query = "DELETE FROM foods WHERE foodID = ?";
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("Error cancelling order:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    console.log("Order cancelled successfully");
+    res.status(200).send("Order cancelled successfully");
+  });
+});
+
+// Route to get foods information from the database
+app.get("/foods", (req, res) => {
+  const sql = "SELECT * FROM foods";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    res.json(results);
+  });
+});
+
+
+// Route to get SEARCHED foods information from the database
+app.get("/searched-foods", (req, res) => {
+  const search = req.query.search;
+
+  // Construct the SQL query with a WHERE clause for the search
+  const sql =
+    "SELECT * FROM foods WHERE foodTitle LIKE ? ESCAPE '!' OR foodCategory LIKE ? ESCAPE '!'";
+  const params = [`%${search}%`, `%${search}%`];
+
+  // Execute the query using db.query
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+    res.json(results);
+    console.log("search", results);
+  });
+});
+
+
+
+// Send User Info to DB
+app.post("/users", (req, res) => {
+  const userInfo = req.body;
+
+  // Check if userEmail already exists
+  const checkQuery = "SELECT * FROM users WHERE userEmail = ?";
+
+  db.query(checkQuery, [userInfo.userEmail], (checkErr, checkResult) => {
+    if (checkErr) {
+      console.error("Error checking user email:", checkErr);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    // If user with userEmail already exists
+    if (checkResult.length > 0) {
+      console.log("User with the email already exists");
+      res.status(409).send("User with the email already exists");
+    } else {
+      // Insert user data into the database
+      const insertQuery = "INSERT INTO users SET ?";
+
+      db.query(insertQuery, userInfo, (insertErr, result) => {
+        if (insertErr) {
+          console.error("Error inserting user data:", insertErr);
+          res.status(500).send("Internal Server Error");
+          return;
+        }
+
+        console.log("User data inserted successfully");
+        res.status(200).send("User data inserted successfully");
+      });
+    }
+  });
+});
+
+
 
 
 
