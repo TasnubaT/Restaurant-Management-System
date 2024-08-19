@@ -23,7 +23,7 @@ const db = mysql.createConnection({
   database: "spice-lounge-db",
 });
 
-// JWT Related APIs
+// JWT Related API
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -31,7 +31,6 @@ app.post("/jwt", async (req, res) => {
   });
   res.send({ token });
 });
-
 
 
 
