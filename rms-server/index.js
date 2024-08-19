@@ -275,6 +275,113 @@ app.get("/users/customer/:email", verifyToken, (req, res) => {
 
 
 
+// Check Cashier
+app.get("/users/cashier/:email", verifyToken, (req, res) => {
+  const email = req.params.email;
+  console.log("email is", email);
+
+  if (email !== req.decoded.email) {
+    return res.status(403).send({ message: "Forbidden" });
+  }
+
+  const sql = "SELECT userRole FROM users WHERE userEmail = ?";
+
+  db.query(sql, [email], (err, user) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log(user);
+    let cashier = false;
+    if (user && user.length > 0) {
+      cashier = user[0].userRole === "cashier";
+    }
+
+    res.send({ cashier });
+  });
+});
+// Check Employee
+app.get("/employee", (req, res) => {
+  const sql = "SELECT * FROM users WHERE userRole != 'customer'";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).send("Internal Server Error");
+      return;
+    }
+
+    res.json(results);
+  });
+});
+
+// Make Admin
+
+app.patch("/users/admin/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("make admin id", id);
+
+  const sql = 'UPDATE users SET userRole = "admin" WHERE userID = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send(result);
+  });
+});
+// Make Manager
+
+app.patch("/users/manager/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("make manager id", id);
+
+  const sql = 'UPDATE users SET userRole = "manager" WHERE userID = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send(result);
+  });
+});
+// Make Cashier
+
+app.patch("/users/cashier/:id", (req, res) => {
+  const id = req.params.id;
+  console.log("make cashier id", id);
+
+  const sql = 'UPDATE users SET userRole = "cashier" WHERE userID = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send(result);
+  });
+});
+
+
+
+
 
 
 
